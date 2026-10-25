@@ -1,0 +1,15 @@
+# User test data (data-driven examples)
+standard_user:
+  username: "standard_user"
+  email: "standard_user@example.com"
+  role: "member"
+
+admin_user:
+  username: "admin_user"
+  email: "admin_user@example.com"
+  role: "administrator"
+
+locales:
+  - "en-US"
+  - "en-GB"
+  - "de-DE"

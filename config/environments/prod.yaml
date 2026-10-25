@@ -1,0 +1,22 @@
+# Production-like environment configuration.
+base_url: "https://qa-myplc.iapmo.org/"
+api_base_url: "https://jsonplaceholder.typicode.com"
+browser: "chromium"
+headless: true
+slow_mo: 0
+viewport_width: 1920
+viewport_height: 1080
+default_timeout: 60000
+navigation_timeout: 60000
+retries: 2
+workers: 6
+locale: "en-US"
+timezone: "UTC"
+record_video: true
+record_trace: true
+screenshot_on_failure: true
+image_threshold: 1
+
+use_selenium_grid: false
+use_browserstack: false
+use_lambdatest: false

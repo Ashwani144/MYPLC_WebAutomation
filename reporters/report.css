@@ -1,0 +1,7 @@
+/* Custom pytest-html report styling.
+   Hide the built-in node-ID "Test" column so the friendly "Title" column
+   (populated from @allure.story in conftest.py) is the primary label. */
+th[data-column-type="testId"],
+td.col-testId {
+  display: none;
+}

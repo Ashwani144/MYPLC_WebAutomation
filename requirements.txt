@@ -1,0 +1,26 @@
+# Core test runner & Playwright
+pytest==8.3.4
+pytest-playwright==0.7.0
+playwright==1.49.1
+
+# Parallel execution
+pytest-xdist==3.6.1
+
+# Flaky test handling / retries
+pytest-rerunfailures==15.0
+
+# Reporting
+pytest-html==4.1.1
+allure-pytest==2.13.5
+
+# Visual regression (snapshot assertions)
+pytest-playwright-visual-snapshot==0.5.1
+
+# Data, config & validation
+PyYAML==6.0.2
+python-dotenv==1.0.1
+jsonschema==4.23.0
+openpyxl==3.1.5
+
+# Notifications / HTTP utilities
+requests==2.32.3

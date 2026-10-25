@@ -1,0 +1,33 @@
+{
+  "name": "iapmo-playwright-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern, modular Playwright + Python (pytest) test automation framework. This package.json provides convenient npm task shortcuts around the Python toolchain and the Allure CLI.",
+  "scripts": {
+    "postinstall": "python -m pip install -r requirements.txt && python -m playwright install --with-deps",
+    "test": "pytest",
+    "test:parallel": "pytest -n 4",
+    "test:ui": "pytest -m ui",
+    "test:api": "pytest -m api",
+    "test:smoke": "pytest -m smoke",
+    "test:regression": "pytest -m regression",
+    "test:visual": "pytest -m visual",
+    "test:chromium": "pytest --app-browser chromium",
+    "test:firefox": "pytest --app-browser firefox",
+    "test:webkit": "pytest --app-browser webkit",
+    "test:headed": "pytest --app-headed",
+    "test:update-snapshots": "pytest -m visual --update-snapshots",
+    "report:html": "python -c \"import webbrowser,os;webbrowser.open('file://'+os.path.abspath('reports/html/report.html'))\"",
+    "report:allure": "allure serve reports/allure-results",
+    "report:allure:generate": "allure generate reports/allure-results -o reports/allure-report --clean",
+    "docker:build": "docker compose -f docker/docker-compose.yml build tests",
+    "docker:test": "docker compose -f docker/docker-compose.yml up --build tests",
+    "grid:up": "docker compose -f docker/docker-compose.yml up -d selenium-hub chrome",
+    "grid:down": "docker compose -f docker/docker-compose.yml down"
+  },
+  "keywords": ["playwright", "python", "pytest", "automation", "testing", "allure", "cross-browser"],
+  "license": "MIT",
+  "devDependencies": {
+    "allure-commandline": "^2.32.0"
+  }
+}

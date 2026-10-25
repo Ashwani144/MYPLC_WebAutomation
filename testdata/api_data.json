@@ -1,0 +1,21 @@
+{
+  "get_post": {
+    "endpoint": "/posts/1",
+    "expected_status": 200,
+    "max_response_time_ms": 3000
+  },
+  "create_post": {
+    "endpoint": "/posts",
+    "payload": {
+      "title": "Playwright API test",
+      "body": "Created by the Playwright Python framework",
+      "userId": 1
+    },
+    "expected_status": 201
+  },
+  "list_users": {
+    "endpoint": "/users",
+    "expected_status": 200,
+    "min_count": 1
+  }
+}

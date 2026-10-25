@@ -1,0 +1,41 @@
+# Orchestrates the test runner and an optional Selenium Grid for remote runs.
+#
+#   Run the suite:              docker compose -f docker/docker-compose.yml up --build tests
+#   Bring up Selenium Grid:     docker compose -f docker/docker-compose.yml up -d selenium-hub chrome
+#
+# Reports are volume-mounted back to ./reports on the host.
+version: "3.9"
+
+services:
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      TEST_ENV: ${TEST_ENV:-dev}
+      HEADLESS: "true"
+      BROWSER: ${BROWSER:-chromium}
+      WORKERS: ${WORKERS:-4}
+    volumes:
+      - ../reports:/app/reports
+    command: ["-n", "4", "-m", "not visual"]
+
+  # ---- Optional Selenium Grid (for USE_SELENIUM_GRID=true scenarios) ----
+  selenium-hub:
+    image: selenium/hub:4.27.0
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+  chrome:
+    image: selenium/node-chrome:4.27.0
+    depends_on:
+      - selenium-hub
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_MAX_SESSIONS: 4
+    shm_size: "2gb"

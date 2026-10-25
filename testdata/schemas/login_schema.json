@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LoginResponse",
+  "type": "object",
+  "required": ["token", "user"],
+  "properties": {
+    "token": { "type": "string", "minLength": 1 },
+    "user": {
+      "type": "object",
+      "required": ["userName", "email", "firstName", "lastName"],
+      "properties": {
+        "userName": { "type": "string" },
+        "email": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClientDetails",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "taxId",
+    "taxType",
+    "website",
+    "primaryContact",
+    "billingContact",
+    "primaryLocation"
+  ],
+  "properties": {
+    "id": { "type": "integer" },
+    "name": { "type": "string" },
+    "taxId": { "type": ["string", "null"] },
+    "taxType": { "type": ["object", "null"] },
+    "website": { "type": ["string", "null"] },
+    "primaryContact": {
+      "type": "object",
+      "required": ["firstName", "lastName", "email", "phoneOne"],
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string" },
+        "phoneOne": { "type": ["string", "null"] }
+      }
+    },
+    "billingContact": {
+      "type": "object",
+      "required": ["firstName", "lastName", "email", "phoneOne"],
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string" },
+        "phoneOne": { "type": ["string", "null"] }
+      }
+    },
+    "primaryLocation": { "type": ["object", "null"] }
+  }
+}

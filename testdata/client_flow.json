@@ -1,0 +1,138 @@
+{
+  "thresholds_ms": {
+    "login": 20000,
+    "create": 30000,
+    "read": 30000,
+    "delete": 1500
+  },
+  "client": {
+    "website": "https://google.com",
+    "taxTypeId": 19,
+    "taxId": "RR11112",
+    "note": "Client created from API",
+    "billingLocation": null,
+    "primaryLocation": {
+      "eavs": [
+        {
+          "attribute": "GOOGLE_LOCATIONS",
+          "locationEavTypeId": 20,
+          "value": "4502 S Steele St, Tacoma, WA 98409, USA",
+          "displayOrder": 0
+        }
+      ],
+      "formatId": 454,
+      "format": {
+        "displayName": "GOOGLE_LOCATIONS",
+        "isDefault": false,
+        "countryId": 71,
+        "country": null,
+        "locations": [],
+        "eavTypes": [
+          {
+            "addressLine": 0,
+            "order": 0,
+            "delimiter": null,
+            "prefix": null,
+            "adminType": null,
+            "formatId": 454,
+            "format": null,
+            "eavTypeId": 20,
+            "eavType": {
+              "name": "GOOGLE_LOCATIONS",
+              "isTerritoryMapper": false,
+              "formats": [],
+              "id": 20,
+              "deleteOnUpdate": false,
+              "isDeactivated": false,
+              "deactivatedBy": null,
+              "deactivatedDate": null,
+              "searchTags": null
+            },
+            "isAdd": false,
+            "isUpdate": false,
+            "id": 2249,
+            "deleteOnUpdate": false,
+            "isDeactivated": false,
+            "deactivatedBy": null,
+            "deactivatedDate": null,
+            "searchTags": null,
+            "eavOrder": 0
+          }
+        ],
+        "id": 454,
+        "deleteOnUpdate": false,
+        "isDeactivated": false,
+        "deactivatedBy": null,
+        "deactivatedDate": null,
+        "searchTags": null
+      },
+      "countryId": 71,
+      "singleLineDisplay": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "multiLineDisplay": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "display": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "Latitude": 47.2160921,
+      "Longitude": -122.4687412,
+      "PostalCode": "98409",
+      "City": "Tacoma",
+      "StateLongName": "Washington",
+      "StateShortName": "WA"
+    }
+  },
+  "contact": {
+    "departments": "Certification",
+    "locationId": 18028,
+    "location": {
+      "display": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "singleLineDisplay": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "multiLineDisplay": "4502 S Steele St, Tacoma, WA 98409, USA",
+      "countryId": 71,
+      "country": null,
+      "formatId": 454,
+      "format": null,
+      "eavs": [
+        {
+          "locationId": 18028,
+          "location": null,
+          "attribute": "GOOGLE_LOCATIONS",
+          "value": "4502 S Steele St, Tacoma, WA 98409, USA",
+          "type": null,
+          "locationEavTypeId": 20,
+          "locationEavType": null,
+          "id": 130008,
+          "deleteOnUpdate": false,
+          "isDeactivated": false,
+          "deactivatedBy": null,
+          "deactivatedDate": null,
+          "searchTags": null
+        }
+      ],
+      "isPOBox": false,
+      "latitude": 47.216092,
+      "longitude": -122.468741,
+      "stateLongName": "Washington",
+      "stateShortName": "WA",
+      "postalCode": "98409",
+      "city": "Tacoma",
+      "relationships": [],
+      "laboratories": [],
+      "inspectionLocations": [],
+      "id": 18028,
+      "deleteOnUpdate": false,
+      "isDeactivated": false,
+      "deactivatedBy": null,
+      "deactivatedDate": null,
+      "searchTags": null
+    }
+  },
+  "discount_rule": {
+    "discountMethod": 1,
+    "discount": 10,
+    "itemCodeId": 4750,
+    "discountRuleType": "3",
+    "notes": "API Test"
+  },
+  "alert": {
+    "isFile": true,
+    "message": "API Test alert on Files"
+  }
+}

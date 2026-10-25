@@ -1,0 +1,886 @@
+{
+	"info": {
+		"_postman_id": "17c1b650-52da-4ee0-94a5-8849342199a9",
+		"name": "1.MYPLC Client Flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39689493"
+	},
+	"item": [
+		{
+			"name": "Login to Certification Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseData = pm.response.json();",
+							"",
+							"//Set AuthKey in a variable",
+							"pm.collectionVariables.set(\"plumbingCertificationAdminAuthKey\",responseData.token);",
+							"",
+							"//Verifying status code",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Verify response time is less than or equal to 3000ms",
+							"pm.test(\"Response time is less than 20000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(20000);",
+							"});",
+							"",
+							"//Verifying Content-Type",
+							"pm.test(\"Content-Type header is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json; charset=utf-8\");",
+							"});",
+							"",
+							"//Verifying if token is not empty",
+							"pm.test(\"Token is not empty\", function () {",
+							"    pm.expect(responseData.token).to.exist.and.to.not.be.empty;",
+							"});",
+							"",
+							"",
+							"pm.test(\"User object has required fields\", function () {",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.user.userName).to.exist;",
+							"    pm.expect(responseData.user.userName).to.be.a(\"string\");",
+							"    pm.expect(responseData.user.email).to.exist;",
+							"    pm.expect(responseData.user.firstName).to.exist;",
+							"    pm.expect(responseData.user.lastName).to.exist;",
+							"   ",
+							"    // Add more relevant field checks here if needed",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"UserUserName\": \"R&TPlumbingCertificationAdmin\",\r\n  \"UserLogInPassword\": \"{{vault:user-credential}}\",\r\n  \"UserSource\": \"mplc\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/auth/login",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Login to Certification Admin",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"UserUserName\": \"R&TPlumbingCertificationAdmin\",\r\n  \"UserLogInPassword\": \"{{vault:user-credential}}\",\r\n  \"UserSource\": \"mplc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{qaurl}}/auth/login",
+							"host": [
+								"{{qaurl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 05 Jan 2025 12:20:54 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "70007"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IlImVFBsdW1iaW5nQ2VydGlmaWNhdGlvbkFkbWluIiwibmFtZWlkIjoiMmJhODMxOWMtZDkzOS00MDk5LTllOTEtNWQzNmUyYTcxMDMzIiwicmVmcmVzaFRva2VuIjoiZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFibWx4ZFdWZmJtRnRaU0k2SWxJbVZGQnNkVzFpYVc1blEyVnlkR2xtYVdOaGRHbHZia0ZrYldsdUlpd2libUZ0Wldsa0lqb2lNbUpoT0RNeE9XTXRaRGt6T1MwME1EazVMVGxsT1RFdE5XUXpObVV5WVRjeE1ETXpJaXdpYm1KbUlqb3hOek0yTURjNU5qVTBMQ0psZUhBaU9qRTNOamMzTURJd05UUXNJbWxoZENJNk1UY3pOakEzT1RZMU5Dd2lhWE56SWpvaWFIUjBjRG92TDNkM2R5NXBZWEJ0YjNKMExtOXlaeThpTENKaGRXUWlPaUpvZEhSd09pOHZkM2QzTG1saGNHMXZjblF1YjNKbkluMC5OVEE3UGNvcWNNSEpERzlxMmNyQjhTOWpyZS04TF9HbjlVZnZLVWxUenhMM3JRdkpDUTRNck1DbEJuUG5CWlE3LWU3VWE3Z0tlXzZXOVQ1NVQ0RloxZyIsIm5iZiI6MTczNjA3OTY1NCwiZXhwIjoxNzY3NjE1NjU0LCJpYXQiOjE3MzYwNzk2NTQsImlzcyI6Imh0dHA6Ly93d3cuaWFwbW9ydC5vcmcvIiwiYXVkIjoiaHR0cDovL3d3dy5pYXBtb3J0Lm9yZyJ9.wsLQQ4HMZidS3FKGYC0O5E_K9C5lSKNjfKMP6OyogB9zQFljflvjxxHrtPfslujo3h0gNVGFkUieMrUIMS8jjw\",\n    \"user\": {\n        \"userName\": \"R&TPlumbingCertificationAdmin\",\n        \"email\": \"R&TPlumbingCertificationAdmin@iapmo.org\",\n        \"passwordHash\": \"AFaBCLLN44BQmUMF814aH6hVjoryPPuEtlSaSJOfNtX4Hn9OC2ttfz117/yXgL7FzA==\",\n        \"securityStamp\": \"40f1fc3a-4c11-47fe-9e23-10bf074fd81e\",\n        \"lockoutEndDateUtc\": null,\n        \"firstName\": \"R&TPlumbingCertificationAdmin\",\n        \"middleName\": null,\n        \"lastName\": \"User\",\n        \"createdDate\": \"2023-02-23T02:01:35.1533932\",\n        \"modifiedDate\": \"2023-02-23T02:01:35.1533932\",\n        \"fax\": null,\n        \"title\": null,\n        \"proposedEmailChange\": null,\n        \"isIAPMOEmployee\": true,\n        \"myPLCAppPreference\": \"Admin\",\n        \"detailsViewPreference\": 1,\n        \"forcePasswordChange\": false,\n        \"contactId\": null,\n        \"contact\": null,\n        \"userStatusId\": 2,\n        \"status\": null,\n        \"languagePreferenceId\": 1,\n        \"languagePreference\": null,\n        \"userCompetency\": [],\n        \"userCompetencyGiven\": [],\n        \"userNotifications\": [],\n        \"tokens\": [],\n        \"userWidgets\": [],\n        \"departments\": [\n            {\n                \"userId\": \"2ba8319c-d939-4099-9e91-5d36e2a71033\",\n                \"user\": null,\n                \"departmentId\": 4,\n                \"department\": {\n                    \"name\": \"Certification\",\n                    \"email\": null,\n                    \"users\": [],\n                    \"claims\": [],\n                    \"roles\": [],\n                    \"notifications\": [],\n                    \"actionItems\": [],\n                    \"actionItemTypes\": [],\n                    \"applications\": [],\n                    \"projects\": [],\n                    \"projectContainers\": [],\n                    \"clientUsers\": [],\n                    \"discountRules\": [],\n                    \"invoices\": [],\n                    \"id\": 4,\n                    \"deleteOnUpdate\": false,\n                    \"isDeactivated\": false,\n                    \"deactivatedBy\": null,\n                    \"deactivatedDate\": null,\n                    \"searchTags\": \"\"\n                },\n                \"isAdd\": false,\n                \"isUpdate\": false,\n                \"id\": 56,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            }\n        ],\n        \"plcClaims\": [],\n        \"plumbingCertificationCommitteeAgendas\": [],\n        \"projectContainersAssignedToEngineer\": [],\n        \"actionItems\": [],\n        \"clientsRepresented\": [],\n        \"contacts\": [],\n        \"signatures\": [],\n        \"activeDirectoryId\": null,\n        \"jiraId\": null,\n        \"emailSignature\": \"<p>R&amp;TPlumbingAdmin</p>\\n\",\n        \"emailConfirmed\": true,\n        \"phoneNumber\": null,\n        \"phoneNumberConfirmed\": false,\n        \"twoFactorEnabled\": false,\n        \"lockoutEnabled\": false,\n        \"accessFailedCount\": 0,\n        \"passwordChangePIN\": null,\n        \"sageBatchNo\": \"QRU4\",\n        \"expirationPasswordChangePIN\": null,\n        \"roles\": [],\n        \"claims\": [],\n        \"logins\": [],\n        \"id\": \"2ba8319c-d939-4099-9e91-5d36e2a71033\",\n        \"clients\": [],\n        \"setting\": \"{\\\"DocumentViewerZoom\\\":\\\"1\\\",\\\"ThumbnailSize\\\":\\\"\\\",\\\"ThumbnailContainerWidth\\\":545,\\\"IsThumbnailPanelOpen\\\":false}\",\n        \"allClaims\": [\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ActionItem.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"AdditionalCompany.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 4,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Engineer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 5,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ActionItemStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 13,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"AdditionalCompany.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 18,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"AdditionalRecognition.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 19,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Application.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 20,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Home.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 21,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 22,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 23,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"EntityType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 40,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Department.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 45,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Profile.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 46,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Application.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 47,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Project.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 50,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Client.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 53,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Invoice.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 54,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.ProjectContainer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 55,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationProductType.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 56,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 57,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Certificate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 61,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"CertificateTemplate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 62,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"CertificationType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 63,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ChangeSet.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 64,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"History.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 65,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ClientRepresentative.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 68,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Contact.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 70,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ContactRelationship.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 71,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"InspectionLocation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 80,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"InspectionTripLineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 87,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Inspector.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 90,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Location.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 91,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectContainerStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 94,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Laboratory.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 96,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 101,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Contact.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 103,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Invoice.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 104,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"LanguagePreference.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 105,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserNotification.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 106,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ClientAgreement.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 107,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"DocumentType.Categories.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 108,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TaxType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 110,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 111,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"WidgetDefinition.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 112,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ManufacturingLocation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 113,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"PlumbingCertificationCommitteeAgenda.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 114,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"PlumbingCertificationCommitteeAgendaLineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 115,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Recommendation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 119,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Standard.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 120,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"StandardStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 121,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Territory.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 122,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Document.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 124,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"DocumentType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 126,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ItemCode.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 130,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Product.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 133,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductStatus.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 137,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Project.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 139,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectContainer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 141,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectStatus.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 151,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Quote.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 152,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Quote.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 153,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Quote.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 154,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Quote.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 155,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Section.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 158,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Section.UploadModels.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 159,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TaxType.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 161,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 162,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.ManufacturingLocation.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 166,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.NonConformityReport.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 167,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Document.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 174,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"InspectionReport.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 183,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"LinkageGroup.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 189,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"NonConformityReport.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 193,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"NonConformityReportLineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 198,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"NonConformityReportLineItemDetail.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 200,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductsEav.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 201,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Standard.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 207,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.UpdateEngineer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 221,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 222,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 223,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 224,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 225,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.UpdateIsInternalFlag.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 226,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Notification.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 227,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Notification.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 228,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductTemplate.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 233,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"RecommendationType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 234,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluationLineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 235,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluationLineItemStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 236,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"User.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 237,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserNotification.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 239,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Role.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 265,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"User.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 267,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"DocumentType.Icons.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 268,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.ProductCode.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 269,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Agreement.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 270,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.Cancel.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 274,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"DiscountRule.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 276,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Country.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 277,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"EmailQueue.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 278,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"EmailTemplate.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 279,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Invoice.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 280,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Invoice.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 281,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Invoice.ApplyDiscount.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 282,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"InvoiceLineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 283,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"InvoiceLineItem.CanApplyDiscounts\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 284,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"LineItemFee.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 285,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Payment.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 286,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Payment.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 287,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"LocationFormat.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 288,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ManufacturingLocationStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 289,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductCode.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 291,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductGroup.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 295,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductGroup.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 296,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductGroup.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 297,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductGroup.Deactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 298,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductGroup.DocumentInsert.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 299,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"QuoteLineItem.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 301,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ShieldType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 302,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ShieldTypeFee.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 303,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluation.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 304,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluation.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 305,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluation.CreateTechnicalEvaluationActionItem.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 306,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluation.UpdateSummary.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 307,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.PCCPendingApprovalCounts.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 308,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Invoice.PostToSage.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 309,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"MexicoApplication.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 310,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"LegendBaseModel.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 311,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SectionLegend.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 312,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SectionProduct.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 313,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SectionSuffix.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 314,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SuffixItem.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 315,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 316,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 317,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.Deactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 318,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.ApplicationStatusesChart.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 319,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.EngineerApplicationCount.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 320,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.ActionItemsInvolved.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 321,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.ActionItemsAssigned.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 322,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.Quote.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 442,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"QuoteGeneratorInspectionExpense.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 543,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"QuoteGeneratorTestingFee.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 544,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"RequestForTesting.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 549,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"RequestForTestingSubType.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 550,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ShieldType.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 560,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"StandardType.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 563,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TestReport.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 711,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationManufacturingLocation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 768,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.UpdateProductCode.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 781,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.SetCustomFileNumber.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 784,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"GL2105.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 832,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"GL2105LineItem.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 837,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 866,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.Deactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 867,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.Reactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 868,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.RemoveEngineer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 869,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.AddEngineer.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 870,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.DocumentInsert.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 871,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.ChangeClientName.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 872,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ClientAgreement.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 873,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.Deactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 881,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ItemCode.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1017,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"NonConformityReportFailureType.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1234,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"NonConformityReportStatus.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1251,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"PlumbingCertificationCommitteeAgendaLineItem.MoveApplicationToAgenda.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1279,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductsEav.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1302,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProductsEav.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1303,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectContainerEvaluation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1343,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectContainerEvaluationScope.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1368,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectContainerEvaluationScopeComment.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1373,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"TechnicalEvaluationLineItem.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1586,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserNotification.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1636,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"PCCode.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1903,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Client.CreateFileAcquisitionProject.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1920,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.UpcomingRenewals.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1935,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationDetails.JobOwnerUpdate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1942,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Admin.EPAExport.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1973,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"CombineProjectRecommendation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 1990,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ModelRecommendation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2004,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectStatusReason.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2010,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectStatusReasonEmailTemplate.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2016,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ApplicationRecommendation.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2022,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"PaymentDocument.Deactivate.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2054,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"UserWidget.MyNotification.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2056,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Comment.UpdateImportApplicationScope.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2057,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SampleGroup.Read.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2058,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SampleGroup.Create.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2059,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"SampleGroup.Update.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2060,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"Application.UpdateApplicationOverrideStandard.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2063,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            },\n            {\n                \"claimType\": \"http://www.iapmort.org/security/action\",\n                \"claimValue\": \"ProjectCertificate.Edit.\",\n                \"claimValueType\": \"string\",\n                \"issuer\": \"http://www.iapmort.org/\",\n                \"originalIssuer\": \"http://www.iapmort.org/\",\n                \"departments\": [],\n                \"roles\": [],\n                \"users\": [],\n                \"id\": 2064,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            }\n        ],\n        \"deleteOnUpdate\": false,\n        \"isDeactivated\": false,\n        \"deactivatedBy\": null,\n        \"deactivatedDate\": null,\n        \"searchTags\": null\n    },\n    \"message\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Create New Client",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//Generating a random string value\r",
+							"var randomStringValue=Math.random().toString(36).substring(2);\r",
+							"\r",
+							"//Generating dynamic client name\r",
+							"var client = \"API_Client_\"+randomStringValue;\r",
+							"pm.environment.set(\"clientName\",client);\r",
+							"\r",
+							"//Generating random 10 digit phone number\r",
+							"var digits = Math.floor(Math.random() * 9000000000) + 1000000000;\r",
+							"pm.collectionVariables.set(\"phoneNumber\",digits);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseData=pm.response.json();\r",
+							"pm.environment.set(\"clientID\",responseData);\r",
+							"\r",
+							"//Deleting phoneNumber variable\r",
+							"pm.collectionVariables.unset(\"phoneNumber\");\r",
+							"\r",
+							"// Test for verifying the response code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response time is less than 50000ms\r",
+							"pm.test(\"Response time is less than 50000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(50000);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).not.eql(\"\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"primaryLocation\": {\r\n    \"eavs\": [\r\n      {\r\n        \"attribute\": \"GOOGLE_LOCATIONS\",\r\n        \"locationEavTypeId\": 20,\r\n        \"value\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n        \"displayOrder\": 0\r\n      }\r\n    ],\r\n    \"formatId\": 454,\r\n    \"format\": {\r\n      \"displayName\": \"GOOGLE_LOCATIONS\",\r\n      \"isDefault\": false,\r\n      \"countryId\": 71,\r\n      \"country\": null,\r\n      \"locations\": [],\r\n      \"eavTypes\": [\r\n        {\r\n          \"addressLine\": 0,\r\n          \"order\": 0,\r\n          \"delimiter\": null,\r\n          \"prefix\": null,\r\n          \"adminType\": null,\r\n          \"formatId\": 454,\r\n          \"format\": null,\r\n          \"eavTypeId\": 20,\r\n          \"eavType\": {\r\n            \"name\": \"GOOGLE_LOCATIONS\",\r\n            \"isTerritoryMapper\": false,\r\n            \"formats\": [],\r\n            \"id\": 20,\r\n            \"deleteOnUpdate\": false,\r\n            \"isDeactivated\": false,\r\n            \"deactivatedBy\": null,\r\n            \"deactivatedDate\": null,\r\n            \"searchTags\": null\r\n          },\r\n          \"isAdd\": false,\r\n          \"isUpdate\": false,\r\n          \"id\": 2249,\r\n          \"deleteOnUpdate\": false,\r\n          \"isDeactivated\": false,\r\n          \"deactivatedBy\": null,\r\n          \"deactivatedDate\": null,\r\n          \"searchTags\": null,\r\n          \"eavOrder\": 0\r\n        }\r\n      ],\r\n      \"id\": 454,\r\n      \"deleteOnUpdate\": false,\r\n      \"isDeactivated\": false,\r\n      \"deactivatedBy\": null,\r\n      \"deactivatedDate\": null,\r\n      \"searchTags\": null\r\n    },\r\n    \"countryId\": 71,\r\n    \"singleLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"multiLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"display\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"Latitude\": 47.2160921,\r\n    \"Longitude\": -122.4687412,\r\n    \"PostalCode\": \"98409\",\r\n    \"City\": \"Tacoma\",\r\n    \"StateLongName\": \"Washington\",\r\n    \"StateShortName\": \"WA\"\r\n  },\r\n  \"name\": \"{{clientName}}\",\r\n  \"phoneNumber\": \"{{phoneNumber}}\",\r\n  \"website\": \"https://google.com\",\r\n  \"taxTypeId\": 19,\r\n  \"taxId\": \"RR11112\",\r\n  \"note\": \"Client created from API\",\r\n  \"billingLocation\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/clients",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Primary Contact",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//Generating random 10 digit phone number\r",
+							"var digits = Math.floor(Math.random() * 9000000000) + 1000000000;\r",
+							"pm.collectionVariables.set(\"primaryPhoneNumber\",digits);\r",
+							"\r",
+							"//Create primary contact first name\r",
+							"var firstName= pm.variables.replaceIn('{{$randomFirstName}}');\r",
+							"pm.collectionVariables.set(\"primaryFirstName\", firstName);\r",
+							"console.log(pm.collectionVariables.get(\"primaryFirstName\"));\r",
+							"\r",
+							"//Create primary contact last name\r",
+							"var lastName= pm.variables.replaceIn('{{$randomLastName}}');\r",
+							"pm.collectionVariables.set(\"primaryLastName\", lastName);\r",
+							"console.log(pm.collectionVariables.get(\"primaryLastName\"))\r",
+							"\r",
+							"//Create primary contact email\r",
+							"var email = pm.collectionVariables.get(\"primaryFirstName\")+pm.collectionVariables.get(\"primaryLastName\")+\"@gmail.com\";\r",
+							"pm.collectionVariables.set(\"primaryEmail\", email);\r",
+							"console.log(pm.collectionVariables.get(\"primaryEmail\"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseData=pm.response.json();\r",
+							"\r",
+							"// Test for verifying the response code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response time is less than 2000ms\r",
+							"pm.test(\"Response time is less than 15000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(15000);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).not.eql(\"\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"relationships\": [],\r\n  \"locationId\": 18028,\r\n  \"location\": {\r\n    \"display\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"singleLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"multiLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"countryId\": 71,\r\n    \"country\": null,\r\n    \"formatId\": 454,\r\n    \"format\": null,\r\n    \"eavs\": [\r\n      {\r\n        \"locationId\": 18028,\r\n        \"location\": null,\r\n        \"attribute\": \"GOOGLE_LOCATIONS\",\r\n        \"value\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n        \"type\": null,\r\n        \"locationEavTypeId\": 20,\r\n        \"locationEavType\": null,\r\n        \"id\": 130008,\r\n        \"deleteOnUpdate\": false,\r\n        \"isDeactivated\": false,\r\n        \"deactivatedBy\": null,\r\n        \"deactivatedDate\": null,\r\n        \"searchTags\": null\r\n      }\r\n    ],\r\n    \"isPOBox\": false,\r\n    \"latitude\": 47.216092,\r\n    \"longitude\": -122.468741,\r\n    \"stateLongName\": \"Washington\",\r\n    \"stateShortName\": \"WA\",\r\n    \"postalCode\": \"98409\",\r\n    \"city\": \"Tacoma\",\r\n    \"relationships\": [],\r\n    \"laboratories\": [],\r\n    \"inspectionLocations\": [],\r\n    \"id\": 18028,\r\n    \"deleteOnUpdate\": false,\r\n    \"isDeactivated\": false,\r\n    \"deactivatedBy\": null,\r\n    \"deactivatedDate\": null,\r\n    \"searchTags\": null\r\n  },\r\n  \"firstName\": \"{{primaryFirstName}}\",\r\n  \"lastName\": \"{{primaryLastName}}\",\r\n  \"email\": \"{{primaryEmail}}\",\r\n  \"phoneOne\": \"{{primaryPhoneNumber}}\",\r\n  \"departments\": \"Certification\",\r\n  \"contactType\": \"Primary\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/clients/{{clientID}}/create-contact/{{clientID}}",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientID}}",
+						"create-contact",
+						"{{clientID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Billing Contact",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//Generating random 10 digit phone number\r",
+							"var digits = Math.floor(Math.random() * 9000000000) + 1000000000;\r",
+							"pm.collectionVariables.set(\"billingPhoneNumber\",digits);\r",
+							"\r",
+							"//Create billing contact first name\r",
+							"var firstName= pm.variables.replaceIn('{{$randomFirstName}}');\r",
+							"pm.collectionVariables.set(\"billingFirstName\", firstName);\r",
+							"console.log(pm.collectionVariables.get(\"billingFirstName\"));\r",
+							"\r",
+							"//Create billing contact last name\r",
+							"var lastName= pm.variables.replaceIn('{{$randomLastName}}');\r",
+							"pm.collectionVariables.set(\"billingLastName\", lastName);\r",
+							"console.log(pm.collectionVariables.get(\"billingLastName\"))\r",
+							"\r",
+							"//Create billing contact email\r",
+							"var email = pm.collectionVariables.get(\"billingFirstName\")+pm.collectionVariables.get(\"billingLastName\")+\"@gmail.com\";\r",
+							"pm.collectionVariables.set(\"billingEmail\", email);\r",
+							"console.log(pm.collectionVariables.get(\"billingEmail\"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseData=pm.response.json();\r",
+							"\r",
+							"// Test for verifying the response code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response time is less than 2000ms\r",
+							"pm.test(\"Response time is less than 15000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(15000);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).not.eql(\"\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"relationships\": [],\r\n  \"locationId\": 18028,\r\n  \"location\": {\r\n    \"display\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"singleLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"multiLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n    \"countryId\": 71,\r\n    \"country\": null,\r\n    \"formatId\": 454,\r\n    \"format\": null,\r\n    \"eavs\": [\r\n      {\r\n        \"locationId\": 18028,\r\n        \"location\": null,\r\n        \"attribute\": \"GOOGLE_LOCATIONS\",\r\n        \"value\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\r\n        \"type\": null,\r\n        \"locationEavTypeId\": 20,\r\n        \"locationEavType\": null,\r\n        \"id\": 130008,\r\n        \"deleteOnUpdate\": false,\r\n        \"isDeactivated\": false,\r\n        \"deactivatedBy\": null,\r\n        \"deactivatedDate\": null,\r\n        \"searchTags\": null\r\n      }\r\n    ],\r\n    \"isPOBox\": false,\r\n    \"latitude\": 47.216092,\r\n    \"longitude\": -122.468741,\r\n    \"stateLongName\": \"Washington\",\r\n    \"stateShortName\": \"WA\",\r\n    \"postalCode\": \"98409\",\r\n    \"city\": \"Tacoma\",\r\n    \"relationships\": [],\r\n    \"laboratories\": [],\r\n    \"inspectionLocations\": [],\r\n    \"id\": 18028,\r\n    \"deleteOnUpdate\": false,\r\n    \"isDeactivated\": false,\r\n    \"deactivatedBy\": null,\r\n    \"deactivatedDate\": null,\r\n    \"searchTags\": null\r\n  },\r\n  \"firstName\": \"{{billingFirstName}}\",\r\n  \"lastName\": \"{{billingLastName}}\",\r\n  \"email\": \"{{billingEmail}}\",\r\n  \"phoneOne\": \"{{billingPhoneNumber}}\",\r\n  \"departments\": \"Certification\",\r\n  \"contactType\": \"Billing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/clients/{{clientID}}/create-contact/{{clientID}}",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientID}}",
+						"create-contact",
+						"{{clientID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Discount Rule-Application",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//Generating a random string value\r",
+							"var randomStringValue=Math.random().toString(36).substring(2);\r",
+							"var discountRuleName= \"Application Discount Rule\" +randomStringValue;\r",
+							"console.log(discountRuleName);\r",
+							"pm.collectionVariables.set(\"ruleName\",discountRuleName);\r",
+							"\r",
+							"// Get today's date\r",
+							"var today = new Date();\r",
+							"\r",
+							"// Format the date as YYYY-MM-DD\r",
+							"var formattedDate = today.getFullYear() + '-' + \r",
+							"                    ('0' + (today.getMonth() + 1)).slice(-2) + '-' + \r",
+							"                    ('0' + today.getDate()).slice(-2);\r",
+							"\r",
+							"// Set the formatted date in a Postman variable\r",
+							"pm.collectionVariables.set(\"todayDate\", formattedDate);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.unset(\"todayDate\");\r",
+							"\r",
+							"// Test for verifying the response code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response time is less than 2000ms\r",
+							"pm.test(\"Response time is less than 50000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(50000);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).not.eql(\"\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"clientId\": \"{{clientID}}\",\r\n  \"discountMethod\": 1,\r\n  \"name\": \"{{ruleName}}\",\r\n  \"discount\": 10,\r\n  \"itemCodeId\": 2183,\r\n  \"discountRuleType\": \"2\",\r\n  \"notes\": \"API Test\",\r\n  \"startDate\": \"{{todayDate}}T18:30:00.000Z\",\r\n  \"endDate\": \"{{todayDate}}T23:30:00.000Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/discount-rules",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"discount-rules"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Alert-File",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"// Test for verifying the response code is 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response time is less than 2000ms\r",
+							"pm.test(\"Response time is less than 15000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(15000);\r",
+							"});\r",
+							"\r",
+							"// Test for verifying the response body is not empty\r",
+							"pm.test(\"Response body is not empty\", function () {\r",
+							"    pm.expect(pm.response.text()).not.eql(\"\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"isFile\": true,\r\n  \"alert\": {\r\n    \"message\": \"API Test alert on Files\"\r\n  },\r\n  \"clientId\": \"{{clientID}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/client-alerts",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"client-alerts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Client Details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseData=pm.response.json();\r",
+							"\r",
+							"// Test Case 1: Verify the response status code\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Verify the response time\r",
+							"pm.test(\"Response time is less than 15000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(15000);\r",
+							"});\r",
+							"\r",
+							"//Verify the response body properties\r",
+							"pm.test(\"Verify response body properties\", function () {\r",
+							"    pm.expect(pm.response.json()).to.have.property('name');\r",
+							"    pm.expect(pm.response.json()).to.have.property('taxId');\r",
+							"    pm.expect(pm.response.json()).to.have.property('taxType');\r",
+							"    pm.expect(pm.response.json()).to.have.property('website');\r",
+							"    pm.expect(pm.response.json()).to.have.property('primaryContact');\r",
+							"    pm.expect(pm.response.json()).to.have.property('billingContact');\r",
+							"    pm.expect(pm.response.json()).to.have.property('primaryLocation');\r",
+							"});\r",
+							"\r",
+							"//Verifying Content-Type\r",
+							"pm.test(\"Content-Type header is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json; charset=utf-8\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"//Verify ClientID created is same\r",
+							"pm.test(\"Client Id is matching\", function(){\r",
+							"   pm.expect(responseData.id).to.eql(pm.environment.get(\"clientID\"))\r",
+							"});\r",
+							"\r",
+							"//Verify Client Name created is same\r",
+							"pm.test(\"Client Name is matching\", function(){\r",
+							"   pm.expect(responseData.name).to.eql(pm.environment.get(\"clientName\"))\r",
+							"});\r",
+							"\r",
+							"//Verify primary contact is matching\r",
+							"pm.test(\"Primary contact details matching\", function(){\r",
+							"   pm.expect(responseData.primaryContact.firstName).to.eql(pm.collectionVariables.get(\"primaryFirstName\"));\r",
+							"   pm.expect(responseData.primaryContact.lastName).to.eql(pm.collectionVariables.get(\"primaryLastName\"));\r",
+							"   pm.expect(responseData.primaryContact.email).to.eql(pm.collectionVariables.get(\"primaryEmail\"));\r",
+							"   pm.expect(parseInt(responseData.primaryContact.phoneOne)).to.eql(pm.collectionVariables.get(\"primaryPhoneNumber\"))\r",
+							"});\r",
+							"\r",
+							"//Verify billing contact is matching\r",
+							"pm.test(\"Billing contact details matching\", function(){\r",
+							"   pm.expect(responseData.billingContact.firstName).to.eql(pm.collectionVariables.get(\"billingFirstName\"));\r",
+							"   pm.expect(responseData.billingContact.lastName).to.eql(pm.collectionVariables.get(\"billingLastName\"));\r",
+							"   pm.expect(responseData.billingContact.email).to.eql(pm.collectionVariables.get(\"billingEmail\"));\r",
+							"   pm.expect(parseInt(responseData.billingContact.phoneOne)).to.eql(pm.collectionVariables.get(\"billingPhoneNumber\"))\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{qaurl}}/clients/{{clientID}}",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create New Client Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{plumbingCertificationAdminAuthKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{qaurl}}/clients/{{clientID}}",
+							"host": [
+								"{{qaurl}}"
+							],
+							"path": [
+								"clients",
+								"{{clientID}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "no-cache"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 05 Jan 2025 12:28:18 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "4495"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"name\": \"API_Client_hxiilytw8t\",\n    \"brands\": null,\n    \"taxId\": \"RR11112\",\n    \"taxTypeId\": 19,\n    \"taxType\": {\n        \"name\": \"VAT\",\n        \"description\": \"VAT\",\n        \"id\": 19,\n        \"deleteOnUpdate\": false,\n        \"isDeactivated\": false,\n        \"deactivatedBy\": null,\n        \"deactivatedDate\": null,\n        \"searchTags\": null\n    },\n    \"website\": \"https://google.com\",\n    \"logoId\": null,\n    \"languagePreferenceId\": null,\n    \"languagePreference\": null,\n    \"adminContactUserId\": null,\n    \"adminContactUser\": null,\n    \"isPreferredClient\": false,\n    \"note\": \"Client created from API\",\n    \"clientManagerId\": null,\n    \"clientManager\": null,\n    \"primaryContactId\": 33416,\n    \"primaryContact\": {\n        \"firstName\": \"Lilliana\",\n        \"lastName\": \"Schroeder\",\n        \"title\": null,\n        \"email\": \"LillianaSchroeder@gmail.com\",\n        \"createdDate\": \"2025-01-05T12:24:38.440812\",\n        \"modifiedDate\": \"2025-01-05T12:24:38.440812\",\n        \"timeZone\": null,\n        \"phoneOne\": \"9446573236\",\n        \"phoneTwo\": null,\n        \"fax\": null,\n        \"departments\": \"Certification\",\n        \"agency\": null,\n        \"locationId\": 10018,\n        \"location\": null,\n        \"userId\": null,\n        \"user\": null,\n        \"relationships\": [],\n        \"contactType\": 0,\n        \"id\": 33416,\n        \"deleteOnUpdate\": false,\n        \"isDeactivated\": false,\n        \"deactivatedBy\": null,\n        \"deactivatedDate\": null,\n        \"searchTags\": null\n    },\n    \"billingContactId\": 33417,\n    \"billingContact\": {\n        \"firstName\": \"Felipa\",\n        \"lastName\": \"Jones\",\n        \"title\": null,\n        \"email\": \"FelipaJones@gmail.com\",\n        \"createdDate\": \"2025-01-05T12:24:50.3809973\",\n        \"modifiedDate\": \"2025-01-05T12:24:50.3809973\",\n        \"timeZone\": null,\n        \"phoneOne\": \"8088395441\",\n        \"phoneTwo\": null,\n        \"fax\": null,\n        \"departments\": \"Certification\",\n        \"agency\": null,\n        \"locationId\": 10018,\n        \"location\": null,\n        \"userId\": null,\n        \"user\": null,\n        \"relationships\": [],\n        \"contactType\": 0,\n        \"id\": 33417,\n        \"deleteOnUpdate\": false,\n        \"isDeactivated\": false,\n        \"deactivatedBy\": null,\n        \"deactivatedDate\": null,\n        \"searchTags\": null\n    },\n    \"consultantContactId\": null,\n    \"consultantContact\": null,\n    \"consultantAgreementId\": null,\n    \"consultantAgreement\": null,\n    \"invoiceTerm\": null,\n    \"sageCustomerNumber\": \"0033529\",\n    \"phoneNumber\": \"2452032509\",\n    \"collectionNote\": null,\n    \"departmentId\": null,\n    \"bcCustomerId\": \"00000000-0000-0000-0000-000000000000\",\n    \"department\": null,\n    \"additionalCompanies\": [],\n    \"applications\": [],\n    \"roleClients\": [],\n    \"clientAgreements\": [],\n    \"projects\": [],\n    \"inspectionReports\": [],\n    \"invoices\": [],\n    \"laboratories\": [],\n    \"manufacturingLocations\": [],\n    \"notifications\": [],\n    \"representingUsers\": [],\n    \"relatedClients\": [],\n    \"discountRules\": [],\n    \"users\": [],\n    \"projectContainers\": [],\n    \"billToInvoices\": [],\n    \"billToQuotes\": [],\n    \"transferClientApplications\": [],\n    \"departmentClients\": [\n        {\n            \"clienttId\": 5128,\n            \"client\": null,\n            \"departmentId\": 12,\n            \"department\": null,\n            \"taxId\": null,\n            \"taxTypeId\": null,\n            \"taxType\": null,\n            \"website\": null,\n            \"logoId\": null,\n            \"languagePreferenceId\": null,\n            \"languagePreference\": null,\n            \"isPreferredClient\": false,\n            \"note\": null,\n            \"primaryContactId\": null,\n            \"primaryContact\": null,\n            \"billingContactId\": null,\n            \"billingContact\": null,\n            \"consultantContactId\": null,\n            \"consultantContact\": null,\n            \"consultantAgreementId\": null,\n            \"consultantAgreement\": null,\n            \"invoiceTerm\": null,\n            \"sageCustomerNumber\": \"0033529\",\n            \"phoneNumber\": null,\n            \"collectionNote\": null,\n            \"id\": 4278,\n            \"deleteOnUpdate\": false,\n            \"isDeactivated\": false,\n            \"deactivatedBy\": null,\n            \"deactivatedDate\": null,\n            \"searchTags\": null\n        }\n    ],\n    \"primaryLocationId\": 10027,\n    \"primaryLocation\": {\n        \"display\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\n        \"singleLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA, UNITED STATES\",\n        \"multiLineDisplay\": \"4502 S Steele St, Tacoma, WA 98409, USA<br>UNITED STATES\",\n        \"countryId\": 71,\n        \"country\": null,\n        \"formatId\": 454,\n        \"format\": null,\n        \"eavs\": [\n            {\n                \"locationId\": 10027,\n                \"location\": null,\n                \"attribute\": \"GOOGLE_LOCATIONS\",\n                \"value\": \"4502 S Steele St, Tacoma, WA 98409, USA\",\n                \"type\": null,\n                \"locationEavTypeId\": 20,\n                \"locationEavType\": {\n                    \"name\": \"GOOGLE_LOCATIONS\",\n                    \"isTerritoryMapper\": false,\n                    \"formats\": [],\n                    \"id\": 20,\n                    \"deleteOnUpdate\": false,\n                    \"isDeactivated\": false,\n                    \"deactivatedBy\": null,\n                    \"deactivatedDate\": null,\n                    \"searchTags\": null\n                },\n                \"id\": 66466,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            }\n        ],\n        \"isPOBox\": false,\n        \"latitude\": 47.216092,\n        \"longitude\": -122.468741,\n        \"stateLongName\": \"Washington\",\n        \"stateShortName\": \"WA\",\n        \"postalCode\": \"98409\",\n        \"city\": \"Tacoma\",\n        \"relationships\": [\n            {\n                \"entityId\": \"5128\",\n                \"entityTypeId\": 31,\n                \"entityType\": null,\n                \"locationId\": 10027,\n                \"location\": null,\n                \"isPrimary\": true,\n                \"isBilling\": true,\n                \"isAdd\": false,\n                \"isUpdate\": false,\n                \"id\": 4649,\n                \"deleteOnUpdate\": false,\n                \"isDeactivated\": false,\n                \"deactivatedBy\": null,\n                \"deactivatedDate\": null,\n                \"searchTags\": null\n            }\n        ],\n        \"laboratories\": [],\n        \"inspectionLocations\": [],\n        \"id\": 10027,\n        \"deleteOnUpdate\": false,\n        \"isDeactivated\": false,\n        \"deactivatedBy\": null,\n        \"deactivatedDate\": null,\n        \"searchTags\": null\n    },\n    \"billingLocationId\": null,\n    \"billingLocation\": null,\n    \"logo\": null,\n    \"id\": 5128,\n    \"deleteOnUpdate\": false,\n    \"isDeactivated\": false,\n    \"deactivatedBy\": null,\n    \"deactivatedDate\": null,\n    \"searchTags\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete Client [Teardown]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test Case 1: Verify the response code is 204\r",
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"// Test Case 2: Verify the response time is less than 1500ms\r",
+							"pm.test(\"Response time is less than 1500ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
+							"});\r",
+							"\r",
+							"//Deleting variables\r",
+							"pm.environment.unset(\"clientID\");\r",
+							"pm.environment.unset(\"clientName\");\r",
+							"pm.environment.unset(\"todayDate\");\r",
+							"pm.environment.unset(\"plumbingCertificationAdminAuthKey\");\r",
+							"pm.collectionVariables.unset(\"primaryFirstName\");\r",
+							"pm.collectionVariables.unset(\"primaryLastName\");\r",
+							"pm.collectionVariables.unset(\"primaryEmail\");\r",
+							"pm.collectionVariables.unset(\"primaryPhoneNumber\");\r",
+							"pm.collectionVariables.unset(\"billingFirstName\");\r",
+							"pm.collectionVariables.unset(\"billingLastName\");\r",
+							"pm.collectionVariables.unset(\"billingEmail\");\r",
+							"pm.collectionVariables.unset(\"billingPhoneNumber\");\r",
+							"pm.collectionVariables.unset(\"ruleName\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{plumbingCertificationAdminAuthKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{qaurl}}/clients/{{clientID}}",
+					"host": [
+						"{{qaurl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "primaryPhoneNumber",
+			"value": ""
+		},
+		{
+			"key": "primaryFirstName",
+			"value": ""
+		},
+		{
+			"key": "primaryLastName",
+			"value": ""
+		},
+		{
+			"key": "primaryEmail",
+			"value": ""
+		},
+		{
+			"key": "billingPhoneNumber",
+			"value": ""
+		},
+		{
+			"key": "billingFirstName",
+			"value": ""
+		},
+		{
+			"key": "billingLastName",
+			"value": ""
+		},
+		{
+			"key": "billingEmail",
+			"value": ""
+		},
+		{
+			"key": "ruleName",
+			"value": ""
+		},
+		{
+			"key": "plumbingCertificationAdminAuthKey",
+			"value": ""
+		}
+	]
+}

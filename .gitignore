@@ -1,0 +1,51 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---- Environment / secrets ----
+.env
+.env.local
+*.local.env
+
+# ---- Test reports & artifacts ----
+reports/
+!reports/.gitkeep
+allure-results/
+allure-report/
+test-results/
+playwright-report/
+*.log
+
+# ---- Playwright / traces / media ----
+**/videos/
+**/traces/
+**/screenshots/
+*.zip
+*.webm
+
+# Visual regression: keep committed baselines, ignore diffs/actuals
+tests/**/__snapshots__/**/*-actual*.png
+tests/**/__snapshots__/**/*-diff*.png
+
+# ---- Caches ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

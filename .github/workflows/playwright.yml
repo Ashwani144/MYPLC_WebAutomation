@@ -1,0 +1,199 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+    inputs:
+      test_env:
+        description: "Environment (dev/staging/prod)"
+        required: false
+        default: "dev"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: playwright-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      TEST_ENV: ${{ github.event.inputs.test_env || 'dev' }}
+      HEADLESS: "true"
+      BROWSER: ${{ matrix.browser }}
+      # Secret credential for the MYPLC API client-flow tests and the UI login
+      # test (tests/ui/test_launch.py reads MYPLC_PASSWORD from the environment).
+      MYPLC_PASSWORD: ${{ secrets.MYPLC_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run UI tests
+        # Produces a dedicated UI report: reports/html/report-ui.html
+        continue-on-error: true
+        run: |
+          pytest -n 4 -m ui --app-browser ${{ matrix.browser }} \
+            --maxfail=0 \
+            --reruns 1 --reruns-delay 2 \
+            --html=reports/html/report-ui.html --self-contained-html \
+            --junitxml=reports/junit/results-ui.xml
+
+      - name: Run API tests
+        # Produces a dedicated API report: reports/html/report-api.html
+        continue-on-error: true
+        run: |
+          pytest -n 4 -m api --app-browser ${{ matrix.browser }} \
+            --maxfail=0 \
+            --reruns 1 --reruns-delay 2 \
+            --html=reports/html/report-api.html --self-contained-html \
+            --junitxml=reports/junit/results-api.xml
+
+      - name: Upload HTML reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-${{ matrix.browser }}
+          path: reports/html/
+          retention-days: 14
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: reports/allure-results/
+          retention-days: 14
+
+      - name: Upload screenshots, videos & traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.browser }}
+          path: |
+            reports/screenshots/
+            reports/videos/
+            reports/traces/
+            reports/junit/
+            reports/metrics.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+  publish-report:
+    name: Publish Allure Report to Pages
+    needs: test
+    if: always() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all Allure results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-*
+          path: allure-artifacts
+          merge-multiple: true
+
+      - name: Setup Java (required by Allure CLI)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Generate Allure report
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-artifacts -o allure-report --clean || echo "No results to generate"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  notify:
+    name: Notify results
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS="${{ needs.test.result }}"
+          COLOR=$([ "$STATUS" = "success" ] && echo "#36a64f" || echo "#d00000")
+          curl -s -X POST -H 'Content-type: application/json' \
+            --data "{\"attachments\":[{\"color\":\"$COLOR\",\"title\":\"Playwright CI\",\"text\":\"Test job result: $STATUS on ${{ github.ref_name }}\"}]}" \
+            "$SLACK_WEBHOOK_URL" || true
+
+  email-report:
+    name: Email HTML report
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download HTML reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: html-report-*
+          path: html-reports
+
+      - name: Send HTML report via email
+        # Recipients are configured in the repo variable REPORT_RECIPIENTS
+        # (comma-separated email ids). The step is skipped if it is empty.
+        if: ${{ vars.REPORT_RECIPIENTS != '' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Playwright API/UI Automation Test Report - ${{ github.repository }} (${{ github.ref_name }}) #${{ github.run_number }} - ${{ needs.test.result }}"
+          to: ${{ vars.REPORT_RECIPIENTS }}
+          from: "Playwright CI <${{ secrets.MAIL_USERNAME }}>"
+          body: |
+            Test run completed for ${{ github.repository }} on branch ${{ github.ref_name }}.
+
+            Result: ${{ needs.test.result }}
+            Commit: ${{ github.sha }}
+            Run:    ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            The self-contained HTML report(s) for each browser are attached
+            (report-ui.html and report-api.html).
+          attachments: html-reports/**/report-*.html
+
