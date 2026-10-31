@@ -546,8 +546,6 @@ class ApplicationDetailsPage(BasePage):
 
         )
 
-        self.page.wait_for_load_state("networkidle", timeout=30000)
-
         expect(
 
             self.page.get_by_role("button", name="All Models")
@@ -721,20 +719,23 @@ class ApplicationDetailsPage(BasePage):
 
 
 
-    def validate_additional_companies(self) -> None:
-
+    def validate_additional_companies(
+        self,
+        expected_model_number: str | None = None,
+    ) -> None:
         empty_state = self.page.get_by_text(
-
             "No additional companies for review.",
-
             exact=True,
-
         )
 
         if empty_state.is_visible():
-
+            if expected_model_number is not None:
+                raise AssertionError(
+                    "Expected Additional Company model "
+                    f"{expected_model_number!r}, but the Additional Companies "
+                    "tab is empty."
+                )
             LOGGER.info("Additional Companies is empty, as expected")
-
             return
 
 
@@ -769,33 +770,76 @@ class ApplicationDetailsPage(BasePage):
 
         expect(company_model_table).to_have_count(1, timeout=15000)
 
-
-
+        expected_model_found = expected_model_number is None
         for index in range(company_count):
-
             company_tab = company_tabs.nth(index)
-
             company_name = company_tab.inner_text().strip()
-
             expect(company_tab).to_be_visible(timeout=15000)
-
             company_tab.click(timeout=15000)
-
-            self.page.wait_for_load_state("networkidle", timeout=30000)
-
             rows = company_model_table.get_by_role("row")
-
             expect(rows.nth(1)).to_be_visible(timeout=30000)
-
             LOGGER.info(
-
                 "Additional Company %s displays model rows",
-
                 company_name,
-
             )
 
+            if expected_model_number is not None:
+                expected_model = company_model_table.get_by_text(
+                    expected_model_number,
+                    exact=True,
+                )
+                try:
+                    expect(expected_model).to_be_visible(timeout=3000)
+                except PlaywrightTimeoutError:
+                    continue
+                expected_model_found = True
+                break
 
+        if not expected_model_found:
+            raise AssertionError(
+                "Additional Company model "
+                f"{expected_model_number!r} was not found in any company."
+            )
+
+    def list_additional_company_models(self, model_number: str) -> None:
+        """List un-recommended models for the selected Additional Company."""
+        company_model_table = self.page.locator("table").filter(
+            has_text="Additional Company Model Number"
+        )
+        model = company_model_table.get_by_text(model_number, exact=True)
+        expect(model).to_be_visible(timeout=15000)
+
+        list_button = self.page.get_by_role(
+            "button",
+            name="List",
+            exact=True,
+        )
+        expect(list_button).to_have_count(1, timeout=15000)
+        expect(list_button).to_be_enabled(timeout=15000)
+        list_button.click(timeout=15000)
+
+        confirmation = self.page.get_by_role("dialog").filter(
+            has_text=re.compile(
+                r"Are you sure you want to List all the un-recommended "
+                r"models for this Additional Company\?",
+                re.IGNORECASE,
+            )
+        )
+        expect(confirmation).to_be_visible(timeout=15000)
+
+        confirm_button = confirmation.get_by_role(
+            "button",
+            name="Confirm",
+            exact=True,
+        )
+        expect(confirm_button).to_be_enabled(timeout=15000)
+        confirm_button.click(timeout=15000)
+        expect(confirmation).to_have_count(0, timeout=60000)
+        expect(model).to_be_visible(timeout=30000)
+        LOGGER.info(
+            "Listed Additional Company models; model %s remains visible",
+            model_number,
+        )
 
     def _write_up_option(self) -> Locator:
         return self.page.get_by_role("listbox").get_by_role(
@@ -1172,6 +1216,27 @@ class ApplicationDetailsPage(BasePage):
 
         expect(self.application_status_value()).to_have_text("List", timeout=60000)
         LOGGER.info("Application List action completed")
+
+    def validate_models_in_certificate_preview(
+        self,
+        model_numbers: tuple[str, ...],
+    ) -> None:
+        """Check that each model appears in Certificate Preview."""
+        preview = self._certificate_preview_dialog()
+        expect(preview).to_be_visible(timeout=30000)
+
+        self._wait_for_certificate_preview_animation()
+
+        for model_number in model_numbers:
+            expect(preview).to_contain_text(
+                model_number,
+                timeout=30000,
+            )
+            LOGGER.info(
+                "Verified model %s in Certificate Preview",
+                model_number,
+            )
+
 
     def open_certificate_preview(self, application_id: str) -> None:
         """Open the observed Certificate Preview overlay for this application."""

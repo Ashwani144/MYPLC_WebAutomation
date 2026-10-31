@@ -47,6 +47,12 @@ python -m pytest tests/api -m api
 # MTPLC scenarios grouped under the source project
 python -m pytest tests/mtplc
 
+# Run the full Main Models CRUD scenario (creates a fresh application and completes it)
+python -m pytest tests/mtplc/test_models_add_edit_delete.py -v --headed
+
+# Run both model scenarios in one execution so the PDF contains both step tables
+python -m pytest tests/mtplc/test_models_add_section.py tests/mtplc/test_models_add_edit_delete.py -v --headed
+
 # Choose a target application for the MTPLC validation workflow
 python -m pytest tests/mtplc/test_application_validation.py --application-number P-254481 -v --app-headed
 
@@ -70,14 +76,14 @@ The master UI tests use the configured base URL and `testdata/login_data.xlsx`; 
 - Pytest HTML: `reports/html/report.html`
 - JUnit XML: `reports/junit/results.xml`
 - Allure results: `reports/allure-results/`
+- MTPLC PDF report: `reports/IAPMO_MYPLC_Automation_Report.pdf`
 - Playwright artifacts: `reports/test-artifacts/`, `reports/screenshots/`, `reports/videos/`, and `reports/traces/`
 - Logs: `reports/logs/`
 
-The MTPLC workflow step/PDF report helper remains in `mtplc/reporting.py`; it keeps its source report behavior isolated from the master's pytest reporter. Existing source screenshots, reports, certificates, `.venv`, `.git`, caches, and live `.env` were excluded as generated or machine/secret-specific data.
+The MTPLC PDF includes per-scenario execution steps and their pass/fail/not-executed status. The combined model command creates one report containing both model scenarios; running either test by itself creates a report for that scenario. CRUD step screenshots are embedded beside their corresponding steps. Workflow tests should record started and completed steps so a failure is attributed to the active step. The report helper remains in `mtplc/reporting.py`, isolated from the master's pytest reporter.
 
 ## Configuration and dependencies
 
 The master `config/settings.py` and environment YAML files are authoritative for common browser, environment, API, and reporting settings. MTPLC-specific credentials and application number variables are documented in `.env.example`. `requirements.txt` already includes the source project's Playwright, pytest, pytest-playwright, pytest-html, and python-dotenv requirements; there is one consolidated dependency declaration.
 
 See `tests/mtplc/` for the preserved source scenarios and `mtplc/pages/` for their page objects. Original source imports were namespaced to avoid shadowing master modules; scenario logic, selectors, assertions, data, and workflows were retained.
-

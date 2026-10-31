@@ -8,6 +8,7 @@ import base64
 import logging
 import os
 import subprocess
+import tempfile
 from datetime import datetime
 from html import escape
 from pathlib import Path
@@ -228,10 +229,13 @@ def pytest_configure(config: pytest.Config) -> None:
 # Determine Actual Failed Step
 # ============================================================
 
-def _get_failed_step_index() -> int | None:
+def _get_failed_step_index(
+    results: list[dict] | None = None,
+) -> int | None:
     """Return the workflow step that was active when the test failed."""
+    results = TEST_RESULTS if results is None else results
     workflow_results = [
-        result for result in TEST_RESULTS
+        result for result in results
         if result["status"] == "FAILED"
     ]
     if workflow_results:
@@ -248,7 +252,10 @@ def _get_failed_step_index() -> int | None:
 # Scenario Step Status
 # ============================================================
 
-def _get_scenario_step_statuses() -> list[str]:
+def _get_scenario_step_statuses(
+    results: list[dict] | None = None,
+    steps: list[str] | None = None,
+) -> list[str]:
     """
     Return an individual status for every scenario step.
 
@@ -265,13 +272,15 @@ def _get_scenario_step_statuses() -> list[str]:
         Every step is PASSED.
     """
 
-    total_steps = len(SCENARIO_STEPS)
+    results = TEST_RESULTS if results is None else results
+    steps = SCENARIO_STEPS if steps is None else steps
+    total_steps = len(steps)
 
     # --------------------------------------------------------
     # No execution result
     # --------------------------------------------------------
 
-    if not TEST_RESULTS:
+    if not results:
 
         return [
             "NOT EXECUTED"
@@ -281,10 +290,10 @@ def _get_scenario_step_statuses() -> list[str]:
     # --------------------------------------------------------
     completed = {
         step
-        for result in TEST_RESULTS
+        for result in results
         for step in result.get("completed_steps", [])
     }
-    failed_step = _get_failed_step_index()
+    failed_step = _get_failed_step_index(results)
 
     statuses = []
     for index in range(1, total_steps + 1):
@@ -301,41 +310,106 @@ def _get_scenario_step_statuses() -> list[str]:
 # Scenario Overall Status
 # ============================================================
 
-def _get_scenario_step_status() -> str:
+def _get_scenario_step_status(
+    results: list[dict] | None = None,
+    statuses: list[str] | None = None,
+) -> str:
     """Determine overall scenario status."""
+    results = TEST_RESULTS if results is None else results
+    statuses = (
+        _get_scenario_step_statuses(results)
+        if statuses is None
+        else statuses
+    )
 
-    if not TEST_RESULTS:
+    if not results:
 
         return "NOT EXECUTED"
 
     if any(
         result["status"] == "FAILED"
-        for result in TEST_RESULTS
+        for result in results
     ):
 
         return "FAILED"
 
     if any(
         result["status"] == "SKIPPED"
-        for result in TEST_RESULTS
+        for result in results
     ):
 
         return "SKIPPED"
 
     if all(
         result["status"] == "PASSED"
-        for result in TEST_RESULTS
+        for result in results
     ):
         return (
             "PASSED"
             if all(
                 status == "PASSED"
-                for status in _get_scenario_step_statuses()
+                for status in statuses
             )
             else "PARTIAL"
         )
 
     return "UNKNOWN"
+
+
+def _get_report_scenarios() -> list[dict]:
+    """Group execution results by scenario for the PDF step summaries."""
+    scenarios: dict[str, dict] = {}
+    results = TEST_RESULTS or [
+        {
+            "status": "NOT EXECUTED",
+            "completed_steps": [],
+            "started_steps": [],
+        }
+    ]
+
+    for result in results:
+        name = result.get("scenario_name") or SCENARIO_NAME
+        steps = result.get("scenario_steps") or SCENARIO_STEPS
+        scenario = scenarios.setdefault(
+            name,
+            {
+                "name": name,
+                "steps": steps,
+                "results": [],
+                "application_numbers": [],
+                "model_summaries": [],
+                "step_screenshots": {},
+            },
+        )
+        scenario["results"].append(result)
+        for screenshot in result.get("step_screenshots", []):
+            scenario["step_screenshots"][int(screenshot["step"])] = (
+                screenshot["path"]
+            )
+        application_number = result.get("application_number")
+        if application_number and application_number not in scenario["application_numbers"]:
+            scenario["application_numbers"].append(application_number)
+        model_summary = result.get("model_number_summary")
+        if model_summary and model_summary not in scenario["model_summaries"]:
+            scenario["model_summaries"].append(model_summary)
+
+    report_scenarios = []
+    for scenario in scenarios.values():
+        statuses = _get_scenario_step_statuses(
+            scenario["results"],
+            scenario["steps"],
+        )
+        report_scenarios.append(
+            {
+                **scenario,
+                "statuses": statuses,
+                "status": _get_scenario_step_status(
+                    scenario["results"],
+                    statuses,
+                ),
+            }
+        )
+    return report_scenarios
 
 
 # ============================================================
@@ -468,6 +542,38 @@ def pytest_runtest_makereport(
             ),
             "screenshot": screenshot_path,
             "url": current_url,
+            "scenario_name": next(
+                (
+                    value
+                    for key, value in item.user_properties
+                    if key == "workflow_scenario_name"
+                ),
+                None,
+            ),
+            "scenario_steps": next(
+                (
+                    value
+                    for key, value in item.user_properties
+                    if key == "workflow_scenario_steps"
+                ),
+                None,
+            ),
+            "application_number": next(
+                (
+                    value
+                    for key, value in item.user_properties
+                    if key == "application_number"
+                ),
+                None,
+            ),
+            "model_number_summary": next(
+                (
+                    value
+                    for key, value in item.user_properties
+                    if key == "model_number_summary"
+                ),
+                None,
+            ),
             "completed_steps": [
                 int(value)
                 for key, value in item.user_properties
@@ -477,6 +583,14 @@ def pytest_runtest_makereport(
                 int(value)
                 for key, value in item.user_properties
                 if key == "workflow_step_started"
+            ],
+            "step_screenshots": [
+                {
+                    "step": int(value.partition("::")[0]),
+                    "path": value.partition("::")[2],
+                }
+                for key, value in item.user_properties
+                if key == "workflow_step_screenshot"
             ],
         }
     )
@@ -796,17 +910,26 @@ def _image_to_base64(
 # Generate Scenario Step Table
 # ============================================================
 
-def _generate_scenario_table() -> str:
-    """Generate the three-column scenario step table."""
-
+def _generate_scenario_table(
+    steps: list[str] | None = None,
+    statuses: list[str] | None = None,
+    step_screenshots: dict[int, str] | None = None,
+) -> str:
+    """Generate the scenario step table with optional visual evidence."""
+    steps = SCENARIO_STEPS if steps is None else steps
     statuses = (
-        _get_scenario_step_statuses()
+        _get_scenario_step_statuses(steps=steps)
+        if statuses is None
+        else statuses
+    )
+    step_screenshots = (
+        {} if step_screenshots is None else step_screenshots
     )
 
     rows = ""
 
     for index, step in enumerate(
-        SCENARIO_STEPS,
+        steps,
         start=1,
     ):
 
@@ -842,6 +965,24 @@ def _generate_scenario_table() -> str:
                 "step-unknown"
             )
 
+        screenshot_path = step_screenshots.get(index)
+        evidence = "&mdash;"
+        if screenshot_path:
+            path = Path(screenshot_path)
+            if path.is_file():
+                image = _image_to_base64(path)
+                if image:
+                    evidence = (
+                        f'<img class="step-evidence-image" src="{image}" '
+                        f'alt="Evidence for step {index}">'
+                    )
+            else:
+                LOGGER.warning(
+                    "Workflow screenshot for step %d was not found: %s",
+                    index,
+                    path,
+                )
+
         rows += f"""
         <tr>
 
@@ -855,6 +996,10 @@ def _generate_scenario_table() -> str:
 
             <td class="step-status {status_class}">
                 {status}
+            </td>
+
+            <td class="step-evidence">
+                {evidence}
             </td>
 
         </tr>
@@ -877,6 +1022,10 @@ def _generate_scenario_table() -> str:
 
                 <th class="step-status-header">
                     Status
+                </th>
+
+                <th class="step-evidence-header">
+                    Evidence
                 </th>
 
             </tr>
@@ -957,9 +1106,56 @@ def _generate_pdf_source_html() -> None:
         else "-"
     )
 
-    overall_status = (
-        _get_scenario_step_status()
+    report_scenarios = _get_report_scenarios()
+    scenario_names = ", ".join(
+        escape(scenario["name"])
+        for scenario in report_scenarios
     )
+    application_numbers = list(
+        dict.fromkeys(
+            number
+            for scenario in report_scenarios
+            for number in scenario["application_numbers"]
+        )
+    )
+    application_number_display = escape(
+        ", ".join(application_numbers) or APPLICATION_NUMBER
+    )
+    model_summaries = list(
+        dict.fromkeys(
+            summary
+            for scenario in report_scenarios
+            for summary in scenario["model_summaries"]
+        )
+    )
+    model_number_display = escape(
+        ", ".join(model_summaries) or MODEL_NUMBER
+    )
+    scenario_step_statuses = [
+        status
+        for scenario in report_scenarios
+        for status in scenario["statuses"]
+    ]
+    scenario_overall_statuses = [
+        scenario["status"]
+        for scenario in report_scenarios
+    ]
+    if "FAILED" in scenario_overall_statuses:
+        overall_status = "FAILED"
+    elif "SKIPPED" in scenario_overall_statuses:
+        overall_status = "SKIPPED"
+    elif scenario_overall_statuses and all(
+        status == "PASSED"
+        for status in scenario_overall_statuses
+    ):
+        overall_status = "PASSED"
+    elif scenario_overall_statuses and all(
+        status == "NOT EXECUTED"
+        for status in scenario_overall_statuses
+    ):
+        overall_status = "NOT EXECUTED"
+    else:
+        overall_status = "PARTIAL"
 
     # ========================================================
     # Test Result Cards
@@ -1111,33 +1307,39 @@ def _generate_pdf_source_html() -> None:
     # Scenario Table
     # ========================================================
 
-    scenario_table = (
-        _generate_scenario_table()
-    )
-
-    scenario_statuses = (
-        _get_scenario_step_statuses()
-    )
-
-    scenario_total = len(
-        SCENARIO_STEPS
-    )
+    scenario_tables = []
+    for scenario in report_scenarios:
+        scenario_table = _generate_scenario_table(
+            scenario["steps"],
+            scenario["statuses"],
+            scenario["step_screenshots"],
+        )
+        scenario_tables.append(
+            f"""
+        <div class="section-title">
+            Scenario Steps - {escape(scenario["name"])}
+        </div>
+        """
+            + scenario_table
+        )
+    scenario_tables = "".join(scenario_tables)
+    scenario_total = len(scenario_step_statuses)
 
     scenario_passed = sum(
         1
-        for status in scenario_statuses
+        for status in scenario_step_statuses
         if status == "PASSED"
     )
 
     scenario_failed = sum(
         1
-        for status in scenario_statuses
+        for status in scenario_step_statuses
         if status == "FAILED"
     )
 
     scenario_not_executed = sum(
         1
-        for status in scenario_statuses
+        for status in scenario_step_statuses
         if status == "NOT EXECUTED"
     )
 
@@ -1449,14 +1651,14 @@ body {{
 
 .step-number-header {{
 
-    width: 12%;
+    width: 8%;
 
     text-align: center !important;
 }}
 
 .step-number {{
 
-    width: 12%;
+    width: 8%;
 
     text-align: center;
 
@@ -1465,25 +1667,48 @@ body {{
 
 .step-description {{
 
-    width: 68%;
+    width: 54%;
 
     text-align: left;
 }}
 
 .step-status-header {{
 
-    width: 20%;
+    width: 14%;
 
     text-align: center !important;
 }}
 
 .step-status {{
 
-    width: 20%;
+    width: 14%;
 
     text-align: center;
 
     font-weight: 700;
+}}
+
+.step-evidence-header {{
+
+    width: 24%;
+
+    text-align: center !important;
+}}
+
+.step-evidence {{
+
+    width: 24%;
+
+    text-align: center;
+}}
+
+.step-evidence-image {{
+
+    max-width: 140px;
+
+    max-height: 72px;
+
+    object-fit: contain;
 }}
 
 .step-passed {{
@@ -1802,7 +2027,7 @@ body {{
     <tr>
 
         <td>Scenario</td>
-        <td>{SCENARIO_NAME}</td>
+        <td>{scenario_names}</td>
 
         <td>Application</td>
         <td>{APPLICATION_NAME}</td>
@@ -1813,10 +2038,10 @@ body {{
     <tr>
 
         <td>Application Number</td>
-        <td>{APPLICATION_NUMBER}</td>
+        <td>{application_number_display}</td>
 
         <td>Model</td>
-        <td>{MODEL_NUMBER}</td>
+        <td>{model_number_display}</td>
 
     </tr>
 
@@ -1924,12 +2149,11 @@ body {{
 
 <div class="section-title">
 
-    Scenarios - {SCENARIO_NAME}
-
+    Scenario Steps
 </div>
 
 
-{scenario_table}
+{scenario_tables}
 
 
 <!-- =======================================================
@@ -1972,7 +2196,7 @@ body {{
         <td>Scenario</td>
 
         <td>
-            {SCENARIO_NAME}
+            {scenario_names}
         </td>
 
     </tr>
@@ -1983,7 +2207,7 @@ body {{
         <td>Application Number</td>
 
         <td>
-            {APPLICATION_NUMBER}
+            {application_number_display}
         </td>
 
     </tr>
@@ -1994,7 +2218,7 @@ body {{
         <td>Model Number</td>
 
         <td>
-            {MODEL_NUMBER}
+            {model_number_display}
         </td>
 
     </tr>
@@ -2166,63 +2390,70 @@ def _generate_pdf_report() -> None:
     )
 
     try:
-
-        command = [
-
-            browser,
-
-            "--headless",
-
-            "--disable-gpu",
-
-            "--no-sandbox",
-
-            "--allow-file-access-from-files",
-
-            "--run-all-compositor-stages-before-draw",
-
-            "--virtual-time-budget=3000",
-
-            f"--print-to-pdf={PDF_REPORT}",
-
-            PDF_SOURCE_HTML.as_uri(),
-        ]
-
-        result = subprocess.run(
-
-            command,
-
-            capture_output=True,
-
-            text=True,
-
-            timeout=90,
-
-            check=False,
-        )
-
-        if (
-            result.returncode == 0
-            and PDF_REPORT.exists()
-        ):
-
-            LOGGER.info(
-                "PDF report generated successfully: %s",
-                PDF_REPORT,
+        with tempfile.TemporaryDirectory(
+            prefix="mtplc-pdf-",
+            dir=REPORTS_DIR,
+        ) as temporary_directory:
+            temporary_directory_path = Path(temporary_directory)
+            temporary_pdf = temporary_directory_path / "report.pdf"
+            browser_profile = temporary_directory_path / "browser-profile"
+            command = [
+                browser,
+                "--headless",
+                "--disable-gpu",
+                "--no-sandbox",
+                "--no-first-run",
+                "--no-default-browser-check",
+                f"--user-data-dir={browser_profile}",
+                "--allow-file-access-from-files",
+                "--run-all-compositor-stages-before-draw",
+                "--virtual-time-budget=3000",
+                f"--print-to-pdf={temporary_pdf}",
+                PDF_SOURCE_HTML.as_uri(),
+            ]
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                timeout=90,
+                check=False,
             )
 
-        else:
-
-            LOGGER.error(
-                "PDF generation failed."
-            )
-
-            if result.stderr:
-
-                LOGGER.error(
-                    "Browser output: %s",
-                    result.stderr,
+            if (
+                result.returncode == 0
+                and temporary_pdf.is_file()
+                and temporary_pdf.stat().st_size > 0
+            ):
+                try:
+                    temporary_pdf.replace(PDF_REPORT)
+                    generated_report = PDF_REPORT
+                except PermissionError:
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    generated_report = PDF_REPORT.with_name(
+                        f"{PDF_REPORT.stem}_{timestamp}{PDF_REPORT.suffix}"
+                    )
+                    temporary_pdf.replace(generated_report)
+                    LOGGER.warning(
+                        "The existing PDF is locked; saved the fresh report "
+                        "to %s. Close the old PDF to resume replacing the "
+                        "standard report path.",
+                        generated_report,
+                    )
+                LOGGER.info(
+                    "PDF report generated successfully: %s",
+                    generated_report,
                 )
+            else:
+                LOGGER.error(
+                    "PDF generation failed: browser exit code %s; "
+                    "fresh PDF output was not created.",
+                    result.returncode,
+                )
+                if result.stderr:
+                    LOGGER.error(
+                        "Browser output: %s",
+                        result.stderr,
+                    )
 
     except subprocess.TimeoutExpired:
 
@@ -2257,6 +2488,3 @@ def pytest_sessionfinish(
     _generate_pdf_source_html()
 
     _generate_pdf_report()
-
-
-

@@ -8,12 +8,12 @@ import allure
 import pytest
 from playwright.sync_api import Page, expect
 
+from config.settings import settings
 from pages.login_page import LoginPage
 from utils.logger import get_logger
 
 log = get_logger("test_launch")
 
-BASE_URL = "https://qa-myplc.iapmo.org/"
 EXPECTED_TITLE = "IAPMO Product Listing & Certification | PLC"
 
 
@@ -23,9 +23,9 @@ EXPECTED_TITLE = "IAPMO Product Listing & Certification | PLC"
 @pytest.mark.smoke
 def test_tc01_launch_url_and_assert_title(app_page: Page) -> None:
     """TC01: Launch the IAPMO PLC URL and assert the page title."""
-    app_page.goto(BASE_URL, wait_until="domcontentloaded")
+    app_page.goto(settings.base_url, wait_until="commit")
 
-    log.info("Launched %s, page title: '%s'", BASE_URL, app_page.title())
+    log.info("Launched %s, page title: '%s'", settings.base_url, app_page.title())
     expect(app_page).to_have_title(EXPECTED_TITLE)
 
 
@@ -43,4 +43,3 @@ def test_tc02_login_with_excel_credentials(app_page: Page, login_data) -> None:
 
     log.info("Post-login URL: %s", app_page.url)
     expect(app_page).to_have_url(re.compile(r"admin/home"))
-

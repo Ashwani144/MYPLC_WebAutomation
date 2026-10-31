@@ -399,14 +399,24 @@ class ClientsPage(BasePage):
             timeout=30000,
         )
 
-        # Bring checkbox into view.
-        cupc.scroll_into_view_if_needed(
+        checkbox_label = cupc.locator("xpath=ancestor::label[1]")
+        expect(checkbox_label).to_have_count(
+            1,
+            timeout=10000,
+        )
+        expect(checkbox_label).to_be_visible(
+            timeout=30000,
+        )
+
+        # The checkbox input can be outside the viewport inside the overlay;
+        # clicking its visible label reliably toggles the associated control.
+        checkbox_label.scroll_into_view_if_needed(
             timeout=10000,
         )
 
         # Select only when it is not already selected.
         if not cupc.is_checked():
-            cupc.check(
+            checkbox_label.click(
                 timeout=15000,
             )
 

@@ -21,7 +21,8 @@ class LoginPage(BasePage):
     PASSWORD = "#userLogInPassword"
 
     # Confirmed MTPLC Sign in button XPath
-    LOGIN_BUTTON = 'xpath=//*[@id="signin"]/div/div[3]/button'
+    LOGIN_BUTTON = '//button[@type="submit"]'
+    AUTHENTICATED_NAVIGATION = "span[data-i18n='nav.clients']"
 
     def __init__(self, page: Page) -> None:
         super().__init__(page)
@@ -65,9 +66,11 @@ class LoginPage(BasePage):
         self.click_login()
 
     def wait_for_login_navigation(self) -> None:
-        """Wait for application processing after login."""
-        self.page.wait_for_load_state("domcontentloaded")
-        self.page.wait_for_load_state("networkidle")
+        """Wait until the authenticated home route and app navigation are ready."""
+        expect(self.page).to_have_url(re.compile(r".*/admin/home.*"))
+        expect(
+            self.page.locator(self.AUTHENTICATED_NAVIGATION)
+        ).to_be_visible(timeout=60000)
 
     def validate_successful_login(self) -> None:
         """Validate successful login using the authenticated home URL."""
@@ -78,4 +81,3 @@ class LoginPage(BasePage):
         )
 
         LOGGER.info("Successful login validated")
-
